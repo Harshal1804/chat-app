@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+
+  # ── PostgreSQL Database ────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: nexuschat_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: chatuser
+      POSTGRES_PASSWORD: chatpass
+      POSTGRES_DB: chatdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatuser -d chatdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - chat_net
+
+  # ── FastAPI + WebSocket App ────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: nexuschat_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://chatuser:chatpass@db:5432/chatdb
+      SECRET_KEY: change-this-secret-in-production-please
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - chat_net
+
+volumes:
+  postgres_data:
+
+networks:
+  chat_net:
+    driver: bridge
