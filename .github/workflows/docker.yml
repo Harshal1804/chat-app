@@ -1,4 +1,4 @@
-name: Chat App CI/CD
+name: Docker CI/CD
 
 on:
   push:
@@ -9,11 +9,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v3
 
     - name: Build Docker Image
-      run: docker build -t chat-app ./backend
+      run: docker build -t chat-app .
 
-    - name: Run Container Test
-      run: docker run -d -p 5000:5000 chat-app
+    - name: Run Container (Test)
+      run: docker run -d -p 8000:8000 chat-app
+
+    - name: Stop Container
+      run: docker ps -q | xargs -r docker stop

@@ -4,6 +4,8 @@ services:
 
   # ── PostgreSQL Database ────────────────────────────────────────
   db:
+    env_file:
+      - .env
     image: postgres:16-alpine
     container_name: nexuschat_db
     restart: unless-stopped
@@ -23,6 +25,8 @@ services:
 
   # ── FastAPI + WebSocket App ────────────────────────────────────
   app:
+    env_file:
+     - .env
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -32,7 +36,7 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://chatuser:chatpass@db:5432/chatdb
-      SECRET_KEY: change-this-secret-in-production-please
+      SECRET_KEY: xyz
     depends_on:
       db:
         condition: service_healthy
