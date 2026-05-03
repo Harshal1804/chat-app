@@ -36,7 +36,7 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://chatuser:chatpass@db:5432/chatdb
-      SECRET_KEY: xyz
+      SECRET_KEY = os.getenv("SECRET_KEY")
     depends_on:
       db:
         condition: service_healthy
